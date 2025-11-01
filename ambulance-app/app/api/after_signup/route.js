@@ -46,7 +46,7 @@ async function geocodeLocation(address) {
   }
 }
 
-/** ✅ POST: Find nearby ambulances */
+
 export async function POST(req) {
   try {
     const { fromLocation, toLocation } = await req.json();

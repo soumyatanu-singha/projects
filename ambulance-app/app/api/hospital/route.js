@@ -26,7 +26,7 @@ export async function POST(req) {
       password: hashedPassword,
     });
 
-    // ✅ Check if Prisma returned a unique constraint error
+    
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

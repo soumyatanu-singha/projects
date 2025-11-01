@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Helper: get coordinates using OpenStreetMap API
+
 async function getCoordinates(location) {
   try {
     const res = await fetch(
@@ -24,7 +24,7 @@ async function getCoordinates(location) {
   }
 }
 
-// GET all ambulances
+
 export async function GET() {
   try {
     const drivers = await prisma.ambulance.findMany();
@@ -35,7 +35,7 @@ export async function GET() {
   }
 }
 
-// CREATE new ambulance
+
 export async function POST(req) {
   try {
    const { id, name, location, fare } = await req.json();
@@ -45,8 +45,7 @@ let lat, lon;
 if (location) { // ONLY geocode if a new location string is provided
   ({ lat, lon } = await getCoordinates(location));
 } else {
-  // Otherwise, ensure lat/lon are not included in the data object for update, 
-  // so they keep their current values.
+
   lat = undefined; 
   lon = undefined; 
 }

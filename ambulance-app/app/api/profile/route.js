@@ -8,7 +8,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const email = searchParams.get("email");
 
-    console.log("📩 Received email:", email);
+    console.log("📩Received email:", email);
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
@@ -20,7 +20,7 @@ export async function GET(req) {
     });
 
     if (user) {
-      console.log("✅ Found User:", user.email);
+      console.log("Found User:", user.email);
       const { password, ...safeUser } = user;
       return NextResponse.json(safeUser, { status: 200 });
     }
@@ -31,15 +31,15 @@ export async function GET(req) {
     });
 
     if (hospital) {
-      console.log("🏥 Found Hospital:", hospital.email);
+      console.log("Found Hospital:", hospital.email);
       const { password, ...safeHospital } = hospital;
       return NextResponse.json(safeHospital, { status: 200 });
     }
 
-    console.log("❌ No matching record found.");
+    console.log(" No matching record found.");
     return NextResponse.json({ error: "No user or hospital found" }, { status: 404 });
   } catch (error) {
-    console.error("🔥 Error fetching profile:", error);
+    console.error(" Error fetching profile:", error);
     return NextResponse.json(
       { error: "Internal Server Error", details: error.message },
       { status: 500 }

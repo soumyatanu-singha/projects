@@ -47,9 +47,7 @@ const handler = NextAuth({
     },
 
     async redirect({ url, baseUrl }) {
-      // We cannot access token here directly in NextAuth v5+,
-      // so redirect logic should be handled from client after sign-in.
-      // But if you still want basic redirection:
+      
       if (url.startsWith(baseUrl)) return url;
       return baseUrl;
     },

@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { createUser, getUserByEmail } from "/prisma/action";
 import bcrypt from "bcryptjs";
 
+<<<<<<< HEAD:ambulance-app/app/api/book/route.js
 
+=======
+>>>>>>> 76f95e8f5654f56376a6c3a2118e73786c169f2d:app/api/book/route.js
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -25,9 +28,17 @@ export async function POST(req) {
     }
 
    
+<<<<<<< HEAD:ambulance-app/app/api/book/route.js
     const hashedPassword = await bcrypt.hash(password, 10);
 
    
+=======
+
+  
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    
+>>>>>>> 76f95e8f5654f56376a6c3a2118e73786c169f2d:app/api/book/route.js
     const newUser = await createUser({
       fullName,
       email,
@@ -36,7 +47,11 @@ export async function POST(req) {
       password: hashedPassword,
     });
 
+<<<<<<< HEAD:ambulance-app/app/api/book/route.js
     
+=======
+   
+>>>>>>> 76f95e8f5654f56376a6c3a2118e73786c169f2d:app/api/book/route.js
     return NextResponse.json(
       { success: true, user: newUser },
       { status: 201 }

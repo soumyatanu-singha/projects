@@ -17,18 +17,18 @@ app.prepare().then(() => {
   });
 
   io.on("connection", (socket) => {
-    console.log("✅ Client connected");
+    console.log("Client connected");
 
     socket.on("updateLocation", ({ lat, lng }) => {
       io.emit("locationUpdate", { lat, lng });
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ Client disconnected");
+      console.log("Client disconnected");
     });
   });
 
   httpServer.listen(port, () =>
-    console.log(`🚀 Server + Socket.IO running on http://localhost:${port}`)
+    console.log(` Server + Socket.IO running on http://localhost:${port}`)
   );
 });

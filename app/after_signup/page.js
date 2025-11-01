@@ -4,8 +4,14 @@ import Link from "next/link";
 import TextType from "../components/TextType";
 import { geocodeAddress } from "@/geocode";
 import { io } from "socket.io-client";
+import { useSession } from "next-auth/react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 export default function Dashboard() {
+
+  const { data: session } = useSession();
 
 
   const [bookedAmbulance, setBookedAmbulance] = useState(null);
@@ -26,6 +32,9 @@ export default function Dashboard() {
   // Nearby ambulances
   const [nearbyAmbulances, setNearbyAmbulances] = useState([]);
   const [loading, setLoading] = useState(false);
+ const [ambulanceName, setambulanceName] = useState("");
+ const [fare, setfare] = useState("");
+ const [ambulanceEmail, setambulanceEmail] = useState("");
 
   const leafletMapRef = useRef(null);
   const markersRef = useRef([]);
@@ -74,7 +83,7 @@ export default function Dashboard() {
 
   const handleSearchNearby = async () => {
     if (!fromLocation || !toLocation) {
-      alert("Please enter both From and To locations");
+      toast.error("Please enter both From and To locations");
       return;
     }
 
@@ -88,21 +97,18 @@ export default function Dashboard() {
 
       const data = await res.json();
       if (data.error) {
-        alert(data.error);
+        toast.error(data.error);
         setNearbyAmbulances([]);
       } else {
         setNearbyAmbulances(data.nearby || []);
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to fetch nearby ambulances");
+      toast.error("Failed to fetch nearby ambulances");
       setNearbyAmbulances([]);
     }
     setLoading(false);
   };
-
-
-
 
 
 
@@ -118,15 +124,15 @@ export default function Dashboard() {
     setMap(myMap);
   }, []);
 
-  // ✅ Connect to socket.io
+  // Connecting to socket.io
   useEffect(() => {
     if (!map) return;
 
     const socket = io(); // same-origin (works with Next.js custom server)
     socketRef.current = socket;
 
-    socket.on("connect", () => console.log("✅ Connected to Socket.IO server"));
-    socket.on("disconnect", () => console.log("❌ Disconnected"));
+    socket.on("connect", () => console.log("Connected to Socket.IO server"));
+    socket.on("disconnect", () => console.log("Disconnected"));
 
     // Listen for incoming location updates
     socket.on("locationUpdate", ({ lat, lng }) => {
@@ -140,7 +146,7 @@ export default function Dashboard() {
           }),
         })
           .addTo(map)
-          .bindPopup("🚑 Live Location");
+          .bindPopup("Live Location");
       } else {
         liveMarkerRef.current.setLatLng(coords);
       }
@@ -151,7 +157,7 @@ export default function Dashboard() {
     return () => socket.disconnect();
   }, [map]);
 
-  // ✅ Emit current location
+  // Emit current location using socket
   useEffect(() => {
     const socket = socketRef.current;
     if (!socket) return;
@@ -170,7 +176,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  // ✅ Draw route between two addresses
+  // Draw the route between two addresses
   const handleRoute = async () => {
     if (!map) return;
     const fromCoords = await geocodeAddress(from);
@@ -205,34 +211,89 @@ const handleBookAmbulance = async (amb) => {
   try {
     setBookedAmbulance(amb);
 
-    // Fetch ambulance location by its ID
-    const res = await fetch(`/api/after_signup/route.js`);
+    //  Fetch ambulance location by ID (use query param)
+    const res = await fetch(`/api/after_signup?id=${amb.id}`);
     const data = await res.json();
+
+    setambulanceName(amb.type);
+    setfare(amb.fare);
 
     if (data?.location?.address) {
       const address = data.location.address;
       setTo(address);
-
-      alert(`🚑 Ambulance booked!\nDestination set to: ${address}`);
+      toast.info(`Ambulance booked!\nDestination set to: ${address}`);
     } else {
-      alert("Failed to fetch ambulance location.");
+      toast.error("Failed to fetch ambulance location.");
     }
   } catch (error) {
     console.error("Booking error:", error);
-    alert("Error booking ambulance.");
+    toast.error("Error booking ambulance.");
   }
 };
 
+
 useEffect(() => {
   if (to) {
-    console.log("✅ To is now:", to);
+    console.log("To is now:", to);
   }
 }, [to]);
+
+
+const handleBookingData = async (amb) => {
+  try {
+    // Check if session exists
+    if (!session?.user) {
+      alert("Please log in to book an ambulance");
+      return;
+    }
+
+    // Validate required fields
+    if (!fromLocation || !toLocation) {
+      alert("Please enter both From and To locations");
+      return;
+    }
+
+    const bookingPayload = {
+      userId: session.user.id || session.user._id || "guest",
+      userName: session.user.name || "Unknown",
+      userEmail: session.user.email || "",
+      ambulanceId: amb.id,
+      ambulanceName: amb.type,
+      fare: amb.fare, 
+      fromLocation,
+      toLocation,
+    };
+
+    console.log("Sending booking data:", bookingPayload);
+
+    const res = await fetch("/api/after_signup/booking", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(bookingPayload),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      console.log("Booking successful:", data);
+      toast.success(`Ambulance booked successfully!\nBooking ID: ${data.bookingId || "N/A"}`);
+    } else {
+      console.error(" Booking failed:", data);
+      alert(`Booking failed: ${data.error || "Unknown error"}`);
+    }
+  } catch (error) {
+    console.error("Error booking ambulance:", error);
+    toast.error("Network error. Please try again.");
+  }
+};
+
+  
 
 
 
   return (
     <section className="min-h-screen bg-black text-white px-8 py-6">
+    
       <header className="flex items-center justify-between mb-12">
         <div>
           <h1 className="text-6xl shadow-green font-bold mb-2">Welcome!</h1>
@@ -379,10 +440,12 @@ useEffect(() => {
   onClick={() =>{ 
     
      handleRoute();
-    handleBookAmbulance(amb)}}
+    handleBookAmbulance(amb);
+  handleBookingData(amb)}
+  }
   className="mt-4 w-full text-lg bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-xl transition transform hover:scale-105"
 >
-  {bookedAmbulance?.id === amb.id ? "Booked ✅" : "Book Ambulance"}
+  {bookedAmbulance?.id === amb.id ? "Booked" : "Book Ambulance"}
 </button>
 
           </div>
@@ -397,7 +460,32 @@ useEffect(() => {
     </div>
   )}
 </section>
- <div id="map" style={{ height: "500px", width: "100%" }}></div>
+ <div id="map" className="border rounded-2xl" style={{  margin: "2rem auto",
+    borderRadius: "30px",
+    boxShadow: "0 8px 48px 0 rgba(26,255,157,0.25), 0 1.5px 5px 0 #3e5ec2",
+    border: "4px solid #10ffb3",
+    background: "linear-gradient(135deg, rgba(34,193,195,0.25) 0%, rgba(253,187,45,0.09) 100%)",
+    backdropFilter: "blur(8px)",
+    transition: "box-shadow 0.4s, border-color 0.4s, background 0.4s",
+    position: "relative",
+    overflow: "hidden",
+    zIndex: "0" , height: "500px", width: "100%" }}></div>
+
+
+
+ <ToastContainer
+  position="top-right"
+  autoClose={3000}
+  hideProgressBar={false}
+  newestOnTop={false}
+  closeOnClick
+  rtl={false}
+  pauseOnFocusLoss
+  draggable
+  pauseOnHover
+  theme="dark"
+/>
+
 
     </section>
   );

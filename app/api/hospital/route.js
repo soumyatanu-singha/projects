@@ -26,7 +26,11 @@ export async function POST(req) {
       password: hashedPassword,
     });
 
+<<<<<<< HEAD:ambulance-app/app/api/hospital/route.js
     
+=======
+    // Check if Prisma returned a unique constraint error
+>>>>>>> 76f95e8f5654f56376a6c3a2118e73786c169f2d:app/api/hospital/route.js
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

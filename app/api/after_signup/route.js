@@ -46,7 +46,11 @@ async function geocodeLocation(address) {
   }
 }
 
+<<<<<<< HEAD:ambulance-app/app/api/after_signup/route.js
 
+=======
+//POST: Find nearby ambulances
+>>>>>>> 76f95e8f5654f56376a6c3a2118e73786c169f2d:app/api/after_signup/route.js
 export async function POST(req) {
   try {
     const { fromLocation, toLocation } = await req.json();
@@ -96,7 +100,7 @@ export async function POST(req) {
   }
 }
 
-/** ✅ GET: Fetch a single ambulance by ID */
+
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);

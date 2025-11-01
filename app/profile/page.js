@@ -12,15 +12,15 @@ export default function SaaSProfilePage() {
 
   useEffect(() => {
     if (session?.user?.email) {
-      console.log("📤 Fetching profile for:", session.user.email);
+      console.log("Fetching profile for:", session.user.email);
       fetch(`/api/profile?email=${session.user.email}`)
         .then(async (res) => {
-          console.log("🧭 Response status:", res.status);
+          console.log(" Response status:", res.status);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
         .then((data) => {
-          console.log("✅ Got profile data:", data);
+          console.log("Got profile data:", data);
           setProfile(data);
         })
         .catch((err) => console.error("Error fetching profile:", err));
@@ -53,7 +53,7 @@ export default function SaaSProfilePage() {
 
   return (
     <div className="min-h-screen bg-black text-green-400">
-      {/* ✅ NAVBAR */}
+      {/* NAVBAR */}
      <nav className="sticky justify-between flex top-0 backdrop-blur-md shadow-xl border border-black hover:bg-white hover:shadow-white hover:border-l-black hover:text-black rounded-3xl  items-center px-8 py-4">
         <h1 className="text-4xl font-extrabold">Profile .</h1>
 
@@ -72,7 +72,7 @@ export default function SaaSProfilePage() {
         </Link>
       </nav>
 
-      {/* ✅ PROFILE SECTION */}
+      
      <main className="flex flex-col justify-center items-center py-20 px-4 min-h-screen bg-zinc-950">
     {/* Radial Gradient Background Detail for Depth */}
     <div className="absolute inset-0 z-0 opacity-50 pointer-events-none" 

@@ -10,8 +10,7 @@ export const prisma =
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
-//
-// 🔹 USER ACTIONS
+
 //
 export async function createUser(data) {
   try {
@@ -41,7 +40,7 @@ export async function getAllUsers() {
 }
 
 //
-// 🔹 HOSPITAL ACTIONS
+//
 //
 export async function createHospital({ name, email, phone, address, password }) {
   try {
@@ -73,8 +72,7 @@ export async function getAllHospitals() {
   });
 }
 
-//
-// 🔹 AMBULANCE ACTIONS
+
 //
 export async function createAmbulance(data) {
   return await prisma.ambulance.create({ data });
@@ -91,8 +89,7 @@ export async function getAmbulancesByHospital(hospitalId) {
   return await prisma.ambulance.findMany({ where: { hospitalId } });
 }
 
-//
-// 🔹 BOOKING ACTIONS
+
 //
 export async function createBooking(data) {
   return await prisma.booking.create({ data });

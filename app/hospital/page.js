@@ -29,15 +29,15 @@ export default function HospitalSignup() {
 
     
     if (res.ok) {
-      alert("Hospital Registered Successfully ✅");
+      alert("Hospital Registered Successfully ");
       console.log("Saved hospital:", data.hospital);
       setForm({ hospitalName: "", email: "", phone: "", address: "", password: "" });
     } else {
-      // ✅ Show API error (email/phone already exists)
+   
       alert(data.error);
     }
   } catch (err) {
-    // Only network or unexpected errors
+    
     console.error(err);
     alert("Something went wrong. Please try again.");
   }
